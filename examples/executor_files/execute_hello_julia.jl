@@ -3,10 +3,14 @@
 # ================================================================
 using DistributedWorkflow, CxxWrap
 
-DistributedWorkflow.compile_workflow("/root/zeda-examples/hello_julia/hello_julia.xpnet", "/root/tmp/build_dir")
+# Change the paths to locate the files according to system settings
+include("/root/DistributedWorkflow.jl/examples/petri_nets/hello_julia_net.jl")
+
+DistributedWorkflow.compile_workflow("/root/tmp/hello_julia.xpnet")
 client = DistributedWorkflow.client(1, "/root/tmp/nodefile", "local", "localhost", 6789)
 
-impl_port = "implementation"
+# new version
+impl_port = "implementation_1"
 jl_impl = "/root/DistributedWorkflow.jl/examples/applications/hello_julia.jl"
 fname = "test_func"
 app = DistributedWorkflow.application_config(impl_port, jl_impl, fname)
