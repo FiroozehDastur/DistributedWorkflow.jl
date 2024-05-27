@@ -1,0 +1,52 @@
+name: Julia CI with Spack
+
+on:
+  push:
+    branches:
+      - main
+      - fd/ci_test  # feature branch that needs testing
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Julia
+      uses: julia-actions/setup-julia@v1
+      with:
+        version: '1.9.2'  # change Julia version as required
+
+    - name: Download distributedworkflow_ubuntu22
+      uses: actions/download-release-asset@v1
+      with:
+        repository: FiroozehDastur/DistributedWorkflow.jl
+        tag: v1.0.0    # Replace with the release tag after adding binaries
+        asset_name: distributedworkflow_ubuntu22
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Install Spack
+      run: |
+        git clone https://github.com/spack/spack.git $HOME/spack
+        . $HOME/spack/share/spack/setup-env.sh
+        echo "source $HOME/spack/share/spack/setup-env.sh" >> $GITHUB_ENV
+
+    - name: Unpack distributedworkflow archive
+      run: |
+        chmod +x distributedworkflow_ubuntu22
+        ./distributedworkflow_ubuntu22 --target $HOME/zeda
+        echo "$HOME/zeda" >> $GITHUB_PATH
+
+    - name: Run Spack Command in Julia Script
+      run: |
+        . $HOME/spack/share/spack/setup-env.sh
+        julia -e '
+          using Base: run
+          spack_location = readchomp(`spack location -i distributedworkflow`)
+          println("Spack package location: ", spack_location)
+        '
