@@ -26,7 +26,7 @@ jobs:
       uses: actions/download-release-asset@v1
       with:
         repository: FiroozehDastur/DistributedWorkflow.jl
-        tag: v1.0.0    # Replace with the release tag after adding binaries
+        tag: v0.1.0-se    # Replace with the release tag after adding binaries
         asset_name: distributedworkflow_ubuntu22
         token: ${{ secrets.GITHUB_TOKEN }}
 
